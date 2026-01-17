@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  # ✅ Open WebUI + Ollama (gebündelt) - Local AI
+  ollama:
+    image: ghcr.io/open-webui/open-webui:ollama
+    container_name: ai-gateway-ollama
+    ports:
+      - "3001:8080"    # Open WebUI
+      - "11434:11434"  # Ollama API
+    volumes:
+      - ollama_data:/root/.ollama
+      - webui_data:/app/backend/data
+    environment:
+      - OLLAMA_BASE_URL=http://127.0.0.1:11434
+      - WEBUI_AUTH=False
+      - PORT=8080
+    restart: unless-stopped
+
+  # ✅ AI Gateway (Node.js Server für lokale Tests)
+  gateway:
+    image: node:20-alpine
+    container_name: ai-gateway-server
+    working_dir: /app
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+    environment:
+      - NODE_ENV=development
+      - OLLAMA_URL=http://ollama:11434
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - GROQ_API_KEY=${GROQ_API_KEY}
+      - HF_API_KEY=${HF_API_KEY}
+    command: sh -c "npm install && npm run dev"
+    depends_on:
+      - ollama
+    restart: unless-stopped
+
+volumes:
+  ollama_data:
+  webui_data:
+
+networks:
+  default:
+    name: ai-gateway-network
