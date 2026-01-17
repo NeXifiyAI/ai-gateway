@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Gateway - Endpunkt Wähler</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .container {
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+      max-width: 600px;
+      width: 100%;
+      padding: 40px;
+    }
+
+    h1 {
+      color: #333;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+
+    .subtitle {
+      color: #666;
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 14px;
+    }
+
+    .endpoint-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      margin-bottom: 30px;
+    }
+
+    .endpoint-card {
+      padding: 20px;
+      background: #f8f9fa;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-align: center;
+    }
+
+    .endpoint-card:hover {
+      border-color: #667eea;
+      background: #e8eaf6;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+    }
+
+    .endpoint-card h3 {
+      color: #667eea;
+      font-size: 14px;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+    }
+
+    .endpoint-card .method {
+      font-size: 12px;
+      color: #999;
+      margin-bottom: 8px;
+    }
+
+    .endpoint-card code {
+      display: block;
+      background: white;
+      padding: 10px;
+      border-radius: 4px;
+      font-size: 12px;
+      word-break: break-all;
+      color: #333;
+    }
+
+    .divider {
+      height: 1px;
+      background: #ddd;
+      margin: 30px 0;
+    }
+
+    .chat-section {
+      background: #f8f9fa;
+      padding: 20px;
+      border-radius: 8px;
+    }
+
+    .chat-section h2 {
+      color: #333;
+      font-size: 16px;
+      margin-bottom: 15px;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    label {
+      display: block;
+      color: #333;
+      font-weight: 500;
+      margin-bottom: 5px;
+      font-size: 14px;
+    }
+
+    select, input, textarea {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-family: inherit;
+      font-size: 14px;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      background: #667eea;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background: #5568d3;
+    }
+
+    button:active {
+      transform: scale(0.98);
+    }
+
+    .response {
+      margin-top: 20px;
+      padding: 15px;
+      background: white;
+      border-radius: 4px;
+      border-left: 4px solid #667eea;
+      max-height: 300px;
+      overflow-y: auto;
+      display: none;
+    }
+
+    .response.active {
+      display: block;
+    }
+
+    .response pre {
+      font-size: 12px;
+      color: #333;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+
+    .footer {
+      text-align: center;
+      color: #999;
+      font-size: 12px;
+      margin-top: 30px;
+      padding-top: 20px;
+      border-top: 1px solid #ddd;
+    }
+
+    .loading {
+      display: none;
+      text-align: center;
+      color: #667eea;
+    }
+
+    .loading.active {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🚀 AI Gateway</h1>
+    <p class="subtitle">Universal AI API - One Interface for All</p>
+
+    <div class="endpoint-grid">
+      <div class="endpoint-card" onclick="copyToClipboard('/api/health')">
+        <h3>Health</h3>
+        <div class="method">GET</div>
+        <code>/api/health</code>
+      </div>
+
+      <div class="endpoint-card" onclick="copyToClipboard('/api/providers')">
+        <h3>Providers</h3>
+        <div class="method">GET</div>
+        <code>/api/providers</code>
+      </div>
+
+      <div class="endpoint-card" onclick="copyToClipboard('/api/models?provider=gemini')">
+        <h3>Models</h3>
+        <div class="method">GET</div>
+        <code>/api/models?provider=gemini</code>
+      </div>
+
+      <div class="endpoint-card" onclick="document.querySelector('.chat-section').scrollIntoView({behavior: 'smooth'})">
+        <h3>Chat</h3>
+        <div class="method">POST</div>
+        <code>/api/chat</code>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="chat-section">
+      <h2>💬 Teste Chat API</h2>
+
+      <div class="form-group">
+        <label for="provider">Provider:</label>
+        <select id="provider">
+          <option value="gemini">Gemini (Google) - FREE</option>
+          <option value="groq">Groq - FREE & FAST</option>
+          <option value="ollama">Ollama (Local) - FREE</option>
+          <option value="openai">OpenAI (ChatGPT)</option>
+          <option value="claude">Claude (Anthropic)</option>
+          <option value="huggingface">HuggingFace</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="message">Message:</label>
+        <textarea id="message" placeholder="Type your message here...">What is AI?</textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="temperature">Temperature (0-1):</label>
+        <input type="number" id="temperature" min="0" max="1" step="0.1" value="0.7">
+      </div>
+
+      <button onclick="sendChat()">Send Chat Request</button>
+
+      <div class="loading" id="loading">
+        ⏳ Loading...
+      </div>
+
+      <div class="response" id="response">
+        <pre id="responseText"></pre>
+      </div>
+    </div>
+
+    <div class="footer">
+      <p>📚 <strong>Docs:</strong> <a href="https://github.com/NeXifiyAI/ai-gateway" style="color: #667eea; text-decoration: none;">GitHub</a></p>
+      <p>Made with ❤️ by NeXifiyAI</p>
+    </div>
+  </div>
+
+  <script>
+    const BASE_URL = window.location.origin;
+
+    function copyToClipboard(text) {
+      const full = BASE_URL + text;
+      navigator.clipboard.writeText(full).then(() => {
+        alert('✅ Kopiert: ' + full);
+      });
+    }
+
+    async function sendChat() {
+      const provider = document.getElementById('provider').value;
+      const message = document.getElementById('message').value;
+      const temperature = parseFloat(document.getElementById('temperature').value);
+
+      if (!message.trim()) {
+        alert('Please enter a message');
+        return;
+      }
+
+      const loading = document.getElementById('loading');
+      const response = document.getElementById('response');
+      const responseText = document.getElementById('responseText');
+
+      loading.classList.add('active');
+      response.classList.remove('active');
+
+      try {
+        const res = await fetch(BASE_URL + '/api/chat', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            provider,
+            message,
+            temperature,
+          })
+        });
+
+        const data = await res.json();
+        responseText.textContent = JSON.stringify(data, null, 2);
+        response.classList.add('active');
+      } catch (error) {
+        responseText.textContent = '❌ Error: ' + error.message;
+        response.classList.add('active');
+      } finally {
+        loading.classList.remove('active');
+      }
+    }
+
+    // Test endpoints on load
+    window.addEventListener('load', async () => {
+      try {
+        const res = await fetch(BASE_URL + '/api/health');
+        const data = await res.json();
+        console.log('✅ Gateway is running!', data);
+      } catch (error) {
+        console.error('❌ Gateway not responding', error);
+      }
+    });
+  </script>
+</body>
+</html>
