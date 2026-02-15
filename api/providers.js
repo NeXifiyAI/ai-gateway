@@ -1,1 +1,10 @@
-const providers = ['gpt-3', 'claude', 'deepseek', 'ollama'];\n\n// existing code...\n
+const providers = [
+  // Existing providers
+  'provider1',
+  'provider2',
+  'ollama',
+  'deepseek',
+  // Other providers
+];
+
+module.exports = providers;
