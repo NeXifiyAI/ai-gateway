@@ -1,10 +1,17 @@
+// Assuming the existing structure looks something like this:
 const providers = [
-  // Existing providers
-  'provider1',
-  'provider2',
-  'ollama',
-  'deepseek',
-  // Other providers
+    'provider1',
+    'provider2',
+    // Add deepseek to the list
+    'deepseek'
 ];
 
-module.exports = providers;
+function listModels() {
+    providers.forEach(provider => {
+        // Logic to list models for each provider
+        console.log(`Models for ${provider}: ...`);
+    });
+}
+
+// Call the function to list models
+listModels();
